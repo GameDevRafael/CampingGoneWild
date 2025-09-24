@@ -16,19 +16,30 @@ public class PlayerController : MonoBehaviour
     float moveX;
     float moveY;
 
+    
+    [HideInInspector] public bool canMove;
+    [HideInInspector] public bool isTargetable;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        canMove = true;
+        isTargetable = true;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(canMove == false) {
+            moveX = 0;
+            moveY = 0;
+            accelaration = 0;
+            return;
+        }
+
         Keybinds();
         
         Movement();
-
-        DebugLogs();
     }
 
     void FixedUpdate()

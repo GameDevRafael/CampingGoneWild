@@ -5,8 +5,12 @@ using UnityEngine.UI;
 public class NPCScript : MonoBehaviour
 {
     private GameObject player;
+    private PlayerController pC;
     private Rigidbody2D rb;
     private Slider slider;
+
+    private GameObject[] resourcesOnDrop;
+    public GameObject coin;
 
     private int speed = 3;
     private int health = 100;
@@ -23,6 +27,7 @@ public class NPCScript : MonoBehaviour
     void Start()
     {
         player = NPCManager.Instance.player;
+        pC = player.GetComponent<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
         slider = GetComponentInChildren<Slider>();
     }
@@ -33,9 +38,12 @@ public class NPCScript : MonoBehaviour
             rb.MovePosition(rb.position + bumpVelocity * Time.fixedDeltaTime);
 
         } else {
-            Vector2 direction = (player.transform.position - transform.position).normalized;
-            Vector2 newPosition = rb.position + direction * speed * Time.fixedDeltaTime;
-            rb.MovePosition(newPosition);
+            if (pC.isTargetable) {
+                Vector2 direction = (player.transform.position - transform.position).normalized;
+                Vector2 newPosition = rb.position + direction * speed * Time.fixedDeltaTime;
+                rb.MovePosition(newPosition);
+            }
+
         }
     }
 
@@ -63,6 +71,7 @@ public class NPCScript : MonoBehaviour
         slider.value = health;
 
         if (health == 0) {
+            Instantiate(coin, transform.position, transform.rotation);
             Destroy(gameObject);
             return; // just in case
         }
