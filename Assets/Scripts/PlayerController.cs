@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,11 +11,26 @@ public class PlayerController : MonoBehaviour
     public float accelaration = 0f;
     public float accelarationRate = 0.1f;
 
+    [Header("Character Status")]
+    public int health = 100;
+    public int baseDamage = 25;
+    public float afterDamageInvuln = 5f;
+    public float debugInvulnTimer = 0f;
+    public bool isInvulnerable = false;
+
     private Rigidbody2D rb;
     private Vector2 moveInput;
+    private Slider slider;
 
+    private NPCScript npcScript;
+    
+    //Internal Variables
     float moveX;
     float moveY;
+    float invulnTimer = 0f;
+    
+    
+
 
     
     [HideInInspector] public bool canMove;
@@ -23,6 +39,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        slider = GetComponentInChildren<Slider>();
         canMove = true;
         isTargetable = true;
     }
@@ -40,6 +57,18 @@ public class PlayerController : MonoBehaviour
         Keybinds();
         
         Movement();
+
+        if (isInvulnerable && invulnTimer < afterDamageInvuln)
+        {
+            invulnTimer += Time.fixedDeltaTime;
+            debugInvulnTimer = invulnTimer;
+        }
+        else
+        {
+            isInvulnerable = false;
+            invulnTimer = 0f;
+        }
+
     }
 
     void FixedUpdate()
@@ -52,7 +81,20 @@ public class PlayerController : MonoBehaviour
         moveX = Input.GetAxisRaw("Horizontal");
         moveY = Input.GetAxisRaw("Vertical");
     }
-    
+
+    public void OnCollisionStay2D(Collision2D collision)
+    {
+        // o motehrfucker só leva dano quando ja tiver acabado o bump time senão ele leva one shot
+        if (collision.gameObject.CompareTag("NPC") && !isInvulnerable)
+        {
+            Debug.Log("Collided with: " + collision.gameObject.name);
+            npcScript = collision.gameObject.GetComponent<NPCScript>();
+            TakeDamage(npcScript.baseDamage);
+
+            
+        }
+    }
+
     void Movement()
     {
         moveInput = new Vector2(moveX, moveY).normalized;
@@ -93,6 +135,13 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = rb.linearVelocity * accelaration;
         }
+    }
+
+    private void TakeDamage(int damage)
+    {
+        health = (int)Mathf.Clamp(health - damage, slider.minValue, slider.maxValue);
+        slider.value = health;
+        isInvulnerable = true;      
     }
 
     void DebugLogs()

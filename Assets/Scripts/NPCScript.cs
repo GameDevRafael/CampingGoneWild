@@ -12,9 +12,11 @@ public class NPCScript : MonoBehaviour
     private GameObject[] resourcesOnDrop;
     public GameObject coin;
 
-    private int speed = 3;
-    private int health = 100;
-    private int damagePlayer = 25; // isto é provisório, n vai ficar assim, é so para levar dano por agora para testar
+    [Header("NPC Stats")]
+    public int speed = 3;
+    public int health = 100;
+    public int baseDamage = 10;
+    //private int damagePlayer = 25; // isto é provisório, n vai ficar assim, é so para levar dano por agora para testar
 
     private int speedBump = 5;
     private Vector2 bumpVelocity;
@@ -67,7 +69,7 @@ public class NPCScript : MonoBehaviour
     }
 
     private void TakeDamage() {
-        health = (int)Mathf.Clamp(health - damagePlayer, slider.minValue, slider.maxValue);
+        health = (int)Mathf.Clamp(health - pC.baseDamage, slider.minValue, slider.maxValue);
         slider.value = health;
 
         if (health == 0) {

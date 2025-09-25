@@ -303,7 +303,7 @@ GameObject:
   - component: {fileID: 4729546487512984235}
   m_Layer: 0
   m_Name: NPC
-  m_TagString: Untagged
+  m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -469,6 +469,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coin: {fileID: 2062856724424309007, guid: e4bb4b40602f59840a295e3bbc83f399, type: 3}
+  speed: 3
+  health: 100
+  baseDamage: 10
 --- !u!1 &8160460782414237451
 GameObject:
   m_ObjectHideFlags: 0
