@@ -9,7 +9,7 @@ public class UIController : MonoBehaviour
     private GameObject playerInstance;
     private PlayerInventory playerBag;
 
-    private string coinText = "Coins:";
+    
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +21,6 @@ public class UIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        coinUIText.text = coinText + playerBag.coins;
+        coinUIText.text = playerBag.coins.ToString();
     }
 }
