@@ -18,25 +18,4 @@ public class WaterPoolScript : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter2D(Collider2D collision) {
-        if (collision.gameObject.CompareTag("Player")) {
-            pC.isTargetable = false;
-            pC.canMove = false;
-            player.GetComponent<SpriteRenderer>().enabled = false;
-            StartCoroutine(PlayerLeavesFromWaterPool());
-        }
-    }
-
-    private IEnumerator PlayerLeavesFromWaterPool() {
-        yield return new WaitForSeconds(5);
-        player.GetComponent<SpriteRenderer>().enabled = true;
-        pC.isTargetable = true;
-        pC.canMove = true;
-    }
-
-    private void OnTriggerExit2D(Collider2D collision) {
-        if (collision.gameObject.CompareTag("Player")) {
-            StopCoroutine(PlayerLeavesFromWaterPool());
-        }
-    }
 }

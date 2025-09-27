@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,8 +20,10 @@ public class PlayerController : MonoBehaviour
     public bool isInvulnerable = false;
 
     private Rigidbody2D rb;
+    private SpriteRenderer spriteRend;
     private Vector2 moveInput;
-    private Slider slider;
+    public Slider healthSlider;
+    public Slider oxygenSlider;
 
     private NPCScript npcScript;
     
@@ -28,7 +31,7 @@ public class PlayerController : MonoBehaviour
     float moveX;
     float moveY;
     float invulnTimer = 0f;
-    
+    float oxygenTime = 5f;
     
 
 
@@ -39,9 +42,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        slider = GetComponentInChildren<Slider>();
         canMove = true;
         isTargetable = true;
+        spriteRend = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -139,14 +142,48 @@ public class PlayerController : MonoBehaviour
 
     private void TakeDamage(int damage)
     {
-        health = (int)Mathf.Clamp(health - damage, slider.minValue, slider.maxValue);
-        slider.value = health;
-        isInvulnerable = true;      
+        health = (int)Mathf.Clamp(health - damage, healthSlider.minValue, healthSlider.maxValue);
+        healthSlider.value = health;
+        isInvulnerable = true;
+
+        if (health == 0) {
+            spriteRend.enabled = false;
+            canMove = false;
+            UIController.Instance.deathInterface.SetActive(true);
+        }
     }
 
-    void DebugLogs()
-    {
-        Debug.Log(accelaration);
-        Debug.Log(rb.linearVelocity.magnitude);
+
+    private void OnTriggerStay2D(Collider2D collision) {
+        if (collision.gameObject.CompareTag("WaterPool") && Input.GetKeyDown(KeyCode.Space)) {
+            isTargetable = false;
+            canMove = false;
+            spriteRend.enabled = false;
+            StartCoroutine(PlayerLeavesFromWaterPool());
+        }
     }
+
+    private IEnumerator PlayerLeavesFromWaterPool() {
+        yield return new WaitForSeconds(oxygenTime / 5);
+        oxygenSlider.value = oxygenSlider.maxValue / 5;
+        yield return new WaitForSeconds(oxygenTime / 5);
+        oxygenSlider.value = oxygenSlider.maxValue * 2 / 5;
+        yield return new WaitForSeconds(oxygenTime / 5);
+        oxygenSlider.value = oxygenSlider.maxValue * 3 / 5;
+        yield return new WaitForSeconds(oxygenTime / 5);
+        oxygenSlider.value = oxygenSlider.maxValue * 4 / 5;
+        yield return new WaitForSeconds(oxygenTime / 5);
+        oxygenSlider.value = oxygenSlider.maxValue;
+        spriteRend.enabled = true;
+        isTargetable = true;
+        canMove = true;
+    }
+
+    private void OnTriggerExit2D(Collider2D collision) {
+        if (collision.gameObject.CompareTag("WaterPool")) {
+            StopCoroutine(PlayerLeavesFromWaterPool());
+            oxygenSlider.value = oxygenSlider.minValue;
+        }
+    }
+
 }
